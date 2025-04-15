@@ -6,13 +6,21 @@
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <body style="margin : 0px; overflow: hidden;">
         <a-scene embedded arjs>
-        <a-marker preset="hiro">
+        <a-marker 
+          type = "pattern"
+          url = "./pattern-logo.patt"
+          smooth = "true"
+          smoothCount="10"
+          smoothTolerance="0.01"
+          >
+
             <a-entity
             position="0 0 0"
             scale="1.0 1.0 1.0"
-            gltf-model="./walk_adapted.glb"
-            animation-mixer="clip: *; loop: repeat; timeScale:1"
+            gltf-model="./walking3d.glb"
+            animation-mixer="clip: 1; loop: repeat; timeScale:1"
             ></a-entity>
+            
         </a-marker>
         <a-entity camera></a-entity>
         </a-scene>
