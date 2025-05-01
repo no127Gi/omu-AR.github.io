@@ -40,9 +40,9 @@
       <a-entity light="type:directional;
                        intensity:1;
                        castShadow:true;
-                       shadowCameraLeft:-2; shadowCameraRight:2;
-                       shadowCameraTop:2;  shadowCameraBottom:-2;
-                       shadowCameraNear:0.1; shadowCameraFar:6;
+                       shadowCameraLeft:-10; shadowCameraRight:10;
+                       shadowCameraTop:10;  shadowCameraBottom:-10;
+                       shadowCameraNear:0.1; shadowCameraFar:10;
                        shadowMapWidth:1024; shadowMapHeight:1024"
                 position="1 2 1"
                 rotation="-45 45 0">
@@ -50,7 +50,7 @@
 
       <!-- 透明な受け皿 -->
       <a-plane position="0 -0.01 0"
-               rotation="90 0 0"
+               rotation="-90 0 0"
                width="4" height="4"
                shadow-catcher></a-plane>
 
