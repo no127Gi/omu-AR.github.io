@@ -36,23 +36,27 @@
 
     <a-marker type="pattern" url="./logo1.patt">
 
-      <!-- 方向ライト（シャドウ用） -->
-      <a-entity light="type:directional;
-                       intensity:1;
-                       castShadow:true;
-                       shadowCameraLeft:-10000; shadowCameraRight:10000;
-                       shadowCameraTop:10000;  shadowCameraBottom:-10000;
-                       shadowCameraNear:0.1; shadowCameraFar:10000;
-                       shadowMapWidth:1024; shadowMapHeight:1024"
-                position="0.05 2 0.05"
-                rotation="-45 70 0">
-      </a-entity>
-
-      <!-- 透明な受け皿 -->
-      <a-plane position="0 -0.01 0"
-               rotation="-90 0 0"
-               width="30" height="30"
-               shadow-catcher></a-plane>
+    <a-plane position="0 -0.01 0"
+             rotation="90 0 0"     <!-- ← 表面を上向きに -->
+             width="4" height="4"
+             shadow-catcher></a-plane>
+    
+    <!-- ↓ DirectionalLight を作り直し -->
+    <a-entity id="sun"
+      light="type:directional;
+             intensity:1;
+             castShadow:true;
+             shadowBias:-0.0004;
+             shadowNormalBias:0.02;
+             shadowCameraLeft:-2; shadowCameraRight:2;
+             shadowCameraTop:2;   shadowCameraBottom:-2;
+             shadowCameraNear:0.1; shadowCameraFar:6;
+             shadowMapWidth:2048; shadowMapHeight:2048"
+      position="2 4 2"
+      rotation="-60 -45 0">
+      <!-- target をマーカー原点に固定 -->
+      <a-entity id="sunTarget" position="0 0 0"></a-entity>
+    </a-entity>
 
       <!-- ===== 周回するモデル ===== -->
       <a-entity id="orbitRoot"
