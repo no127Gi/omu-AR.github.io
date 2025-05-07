@@ -2,93 +2,97 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8"/>
+  <title>AR.js Model Switcher</title>
+
+  <!-- A‑Frame + Extras + AR.js -->
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.2.0/dist/aframe-extras.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 
+  <!-- 画面固定 UI の簡易スタイル -->
   <style>
-    /* ==== 画面固定 UI ==== */
-    #ui {
-      position: fixed;           /* A‑Frame の上に載せる */
-      bottom: 1rem;
-      left: 0; right: 0;
-      display: flex;
-      justify-content: center;
-      gap: .5rem;
-      pointer-events: auto;      /* AR.js 側とイベント競合しない */
-    }
-    .model-btn{
-      padding:.6rem 1rem;
-      border:1px solid #fff;
-      border-radius:6px;
-      background:rgba(0,0,0,.5);
-      color:#fff;font-size:.9rem;
-      backdrop-filter: blur(4px);
-    }
+    body      { margin:0; overflow:hidden; }
+    #ui       { position:fixed; bottom:1rem; left:0; right:0;
+                display:flex; justify-content:center; gap:.5rem;
+                pointer-events:auto; font-family:sans-serif; }
+    .btn      { padding:.6rem 1rem; border:1px solid #fff; border-radius:6px;
+                background:rgba(0,0,0,.55); color:#fff; font-size:.9rem;
+                backdrop-filter:blur(6px); cursor:pointer; }
+    .btn:active{ transform:scale(.95); }
   </style>
 </head>
 
-<body style="margin:0;overflow:hidden;">
+<body>
 
-  <!-- ======================================================== -->
-  <!-- A‑Frame / AR.js シーン                                   -->
-  <!-- ======================================================== -->
-  <a-scene embedded arjs>
+<!-- ───────────────────────────────────────────────────────────── -->
+<!-- A‑Frame / AR.js シーン                                        -->
+<!-- ───────────────────────────────────────────────────────────── -->
+<a-scene embedded
+         arjs="sourceType:webcam; debugUIEnabled:false">
 
-    <!-- マーカー -->
-    <a-marker type="pattern" url="./logo1.patt">
+  <!-- アンビエントライト（真っ黒対策） -->
+  <a-entity light="type:ambient; intensity:0.5"></a-entity>
 
-      <a-entity id="orbitRoot"
-                animation="property:rotation; to:0 -360 0; loop:true; dur:5000; easing:linear">
+  <!-- マーカー -->
+  <a-marker type="pattern" url="./logo1.patt">
 
-        <!-- 切替対象のモデル本体 -->
-        <a-entity id="model"
-                  gltf-model="#m1"
-                  position="1.3 0 0"
-                  scale="1 1 1"
-                  animation-mixer>
-        </a-entity>
+    <!-- 周回させる“軌道” -->
+    <a-entity id="orbitRoot"
+              animation="property:rotation; to:0 -360 0; dur:5000; loop:true; easing:linear">
 
-      </a-entity>
-    </a-marker>
+      <!-- ==== モデル 1 ==== -->
+      <a-entity id="m1Ent"
+                visible="true"
+                gltf-model="#m1"
+                position="1.3 0 0"
+                scale="0.8 0.8 0.8"
+                animation-mixer></a-entity>
 
-    <a-entity camera></a-entity>
-    <a-assets>
-      <a-asset-item id="m1" src="./ito_walking.glb"></a-asset-item>
-      <a-asset-item id="m2" src="./walk_adapted.glb"></a-asset-item>
-    </a-assets>
-  </a-scene>
+      <!-- ==== モデル 2 ==== -->
+      <a-entity id="m2Ent"
+                visible="false"
+                gltf-model="#m2"
+                position="1.3 0 0"
+                scale="1 1 1"
+                animation-mixer></a-entity>
 
-  <!-- ======================================================== -->
-  <!-- 画面固定 UI                                              -->
-  <!-- ======================================================== -->
-  <div id="ui">
-    <button class="model-btn" data-src="#m1" data-scale="1 1 1">3Dモデル1</button>
-    <button class="model-btn" data-src="#m2" data-scale="0.8 0.8 0.8">3Dモデル2</button>
-  </div>
+    </a-entity>
+  </a-marker>
 
-  <script>
-    /* ===== 切替 ===== */
-    const modelEntity = document.querySelector('#model');
+  <a-entity camera></a-entity>
 
-    document.querySelectorAll('.model-btn').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        const src   = btn.dataset.src;      // #m1 など
-        const scale = btn.dataset.scale;    // "1 1 1" など
-        modelEntity.setAttribute('gltf-model', src);
-        modelEntity.setAttribute('scale',      scale);
+  <!-- 事前ロードするアセット -->
+  <a-assets>
+    <a-asset-item id="m1" src="./ito_walking.glb"></a-asset-item>
+    <a-asset-item id="m2" src="./walk_adapted.glb"></a-asset-item>
+  </a-assets>
+</a-scene>
 
-        /* anim再開 */
-        modelEntity.addEventListener('model-loaded',()=>{
-          modelEntity.setAttribute('animation-mixer', {
-            clip:'*',
-            loop:'repeat',
-            timeScale:1
-          });
-        },{once:true});
-      });
+<!-- ───────────────────────────────────────────────────────────── -->
+<!-- 画面固定 UI                                                  -->
+<!-- ───────────────────────────────────────────────────────────── -->
+<div id="ui">
+  <button class="btn" data-show="#m1Ent">3Dモデル 1</button>
+  <button class="btn" data-show="#m2Ent">3Dモデル 2</button>
+</div>
+
+<!-- ───────────────────────────────────────────────────────────── -->
+<!-- モデル切替ロジック                                           -->
+<!-- ───────────────────────────────────────────────────────────── -->
+<script>
+  let current = '#m1Ent';                       // いま表示しているモデル
+
+  document.querySelectorAll('.btn').forEach(btn=>{
+    btn.addEventListener('click', () => {
+      const next = btn.dataset.show;            // 表示したいモデル
+      if (next === current) return;             // 同じなら何もしない
+
+      document.querySelector(current).setAttribute('visible', false);
+      document.querySelector(next).setAttribute('visible', true);
+      current = next;
     });
-  </script>
+  });
+</script>
 
 </body>
 </html>
