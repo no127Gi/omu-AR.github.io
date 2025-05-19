@@ -63,13 +63,13 @@
     intensity: 0.8;
     castShadow: true;
     shadowCameraNear: 0.1;
-           shadowCameraFar: 1000;
+           shadowCameraFar: 10000;
            shadowCameraLeft: -10;
            shadowCameraRight: 10;
            shadowCameraTop: 10;
            shadowCameraBottom: -10"
-    position="1.1 4 0"
-    target="#orbitRoot">
+    position="0 5 0"
+    rotation="-90 0 0">
     </a-entity>
 
     <!-- 公転させる“親” -->
@@ -93,15 +93,15 @@
                 scale="1 1 1"
                 animation-mixer
                 visible="false"
-                shadow="cast: false; receive: false">
+                shadow="cast: true; receive: false">
       </a-entity>
 
     </a-entity>
 
      <a-plane apply-shadowmaterial
              rotation="-90 0 0"
-             width="4"
-             height="4"
+             width="10"
+             height="10"
              position="0 0 0">
     </a-plane>
 
