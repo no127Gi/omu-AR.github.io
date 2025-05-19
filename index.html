@@ -54,19 +54,24 @@
                     intensity: 0.5">
     </a-entity>
     
-    <a-entity light="type: directional;
-    color: #ffffff;
-    intensity: 0.8;
-    castShadow: true;
-    shadowCameraFar: 100;
-    shadowBias: -0.0001"
-    position="1.1 4 0"
-    target="#orbitRoot"
-    animation="property:rotation; to:0 -360 0; loop:true; dur:5000; easing:linear">
-    </a-entity>
 
   <!-- マーカー -->
   <a-marker type="pattern" url="./logo1.patt">
+
+    <a-entity light="type: directional;
+    color: #ffffff;
+    intensity: 0.5;
+    castShadow: true;
+    shadowCameraNear: 0.1;
+           shadowCameraFar: 50;
+           shadowCameraLeft: -10;
+           shadowCameraRight: 10;
+           shadowCameraTop: 10;
+           shadowCameraBottom: -10"
+    position="0 4 0"
+    target="#orbitRoot"
+    animation="property:rotation; to:0 -360 0; loop:true; dur:5000; easing:linear">
+    </a-entity>
 
     <!-- 公転させる“親” -->
     <a-entity id="orbitRoot"
