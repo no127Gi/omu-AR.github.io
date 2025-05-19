@@ -32,31 +32,52 @@
 <!-- ────────────────────────────────
      A‑Frame / AR.js シーン
 ───────────────────────────────── -->
-<a-scene embedded arjs>
+<a-scene embedded arjs
+         renderer="shadowMapEnabled: true; shadowMapType: PCFSoftShadowMap">
 
-  <!-- マーカー -->
+  <!-- シャドウ有効ディレクショナルライト -->
+  <a-entity
+    light="type: directional;
+           intensity: 0.8;
+           color: #FFF;
+           castShadow: true;
+           shadowCameraLeft: -2;
+           shadowCameraRight: 2;
+           shadowCameraTop: 2;
+           shadowCameraBottom: -2;
+           shadowMapWidth: 1024;
+           shadowMapHeight: 1024"
+    position="0 4 0">
+  </a-entity>
+
   <a-marker type="pattern" url="./logo1.patt">
 
-    <!-- 公転させる“親” -->
-    <a-entity id="orbitRoot"
-              animation="property:rotation; to:0 -360 0; loop:true; dur:5000; easing:linear">
+    <!-- 平面で影を受ける -->
+    <a-plane rotation="-90 0 0"
+             width="4" height="4"
+             position="0 0 0"
+             color="#CCC"
+             shadow="receive: true">
+    </a-plane>
 
-      <!-- モデル 1（初期表示） -->
+    <a-entity id="orbitRoot" animation="property: rotation; to:0 -360 0; loop:true; dur:5000; easing:linear">
+
       <a-entity id="m1Ent"
                 gltf-model="#m1"
                 position="1.1 0 0"
                 scale="1 1 1"
                 animation-mixer
-                visible="true">
+                visible="true"
+                shadow="cast: true; receive: false">
       </a-entity>
 
-      <!-- モデル 2（非表示スタート） -->
       <a-entity id="m2Ent"
                 gltf-model="#m2"
                 position="1.1 0 0"
                 scale="1 1 1"
                 animation-mixer
-                visible="false">
+                visible="false"
+                shadow="cast: true; receive: false">
       </a-entity>
 
     </a-entity>
@@ -64,7 +85,6 @@
 
   <a-entity camera></a-entity>
 
-  <!-- 事前ロード -->
   <a-assets>
     <a-asset-item id="m1" src="./ito_walking.glb"></a-asset-item>
     <a-asset-item id="m2" src="./walk_adapted.glb"></a-asset-item>
