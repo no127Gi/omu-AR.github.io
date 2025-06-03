@@ -109,6 +109,26 @@
                 shadow="cast: true; receive: false">
       </a-entity>
 
+      <!-- モデル 4（非表示スタート） -->
+      <a-entity id="m4Ent"
+                gltf-model="#m4"
+                position="1.1 0 0"
+                scale="1 1 1"
+                animation-mixer
+                visible="false"
+                shadow="cast: true; receive: false">
+      </a-entity>
+
+      <!-- モデル 5（非表示スタート） -->
+      <a-entity id="m5Ent"
+                gltf-model="#m5"
+                position="1.1 0 0"
+                scale="1 1 1"
+                animation-mixer
+                visible="false"
+                shadow="cast: true; receive: false">
+      </a-entity>
+
     </a-entity>
 
     <a-plane apply-shadowmaterial
@@ -127,6 +147,8 @@
     <a-asset-item id="m1" src="./aokuro.glb"></a-asset-item>
     <a-asset-item id="m2" src="./akakuro.glb"></a-asset-item>
     <a-asset-item id="m3" src="./akashiro.glb"></a-asset-item>
+    <a-asset-item id="m4" src="./kuroshiro.glb"></a-asset-item>
+    <a-asset-item id="m5" src="./murasaki.glb"></a-asset-item>
   </a-assets>
 </a-scene>
 
@@ -137,6 +159,8 @@
   <button class="model-btn" data-target="m1Ent">model 1</button>
   <button class="model-btn" data-target="m2Ent">model 2</button>
   <button class="model-btn" data-target="m3Ent">model 3</button>
+  <button class="model-btn" data-target="m3Ent">model 4</button>
+  <button class="model-btn" data-target="m3Ent">model 5</button>
 </div>
 
 
@@ -144,7 +168,7 @@
      切替ロジック
 ───────────────────────────────── -->
 <script>
-  const allIds = ['m1Ent','m2Ent','m3Ent'];   // 追加したらここに ID を足す
+  const allIds = ['m1Ent','m2Ent','m3Ent','m4Ent','m5Ent'];   // 追加したらここに ID を足す
 
   document.querySelectorAll('.model-btn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
