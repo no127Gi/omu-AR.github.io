@@ -53,15 +53,18 @@
                     color: #ffffff;
                     intensity: 0.5">
     </a-entity>
-    
-
-  <!-- マーカー -->
-  <a-marker type="pattern" url="./logo1.patt" size="0.16">
-
   
     <!-- 光源 -->
     <a-entity light="type: directional;
     color: #ffffff;
+    intensity: 0.8;
+    castShadow: true;
+    shadowCameraNear: 0.1;
+           shadowCameraFar: 1000;
+           shadowCameraLeft: -10;
+           shadowCameraRight: 10;
+           shadowCameraTop: 10;
+           shadowCameraBottom: -10"
     position="0 10 0"
     rotation="0 0 -90">
     </a-entity>
