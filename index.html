@@ -129,28 +129,62 @@
 ───────────────────────────────── -->
 <script>
   const allIds = ['m1Ent','m2Ent','m3Ent','m4Ent','m5Ent'];
-  let currentModel = 'm1Ent'; // 現在表示中のモデルID
+  let currentModel = 'm1Ent';
+  let currentMixer = null; // アニメーションミキサーの参照を保持
 
   // モデルの削除とメモリ解放を行う関数
   function removeEntity(entityId) {
     const entity = document.getElementById(entityId);
     if (entity) {
+      // アニメーションミキサーの停止と解放
+      if (currentMixer) {
+        currentMixer.stopAllAction();
+        currentMixer = null;
+      }
+
       // モデルのメッシュとマテリアルを解放
       const mesh = entity.getObject3D('mesh');
       if (mesh) {
-        if (mesh.material) {
-          if (Array.isArray(mesh.material)) {
-            mesh.material.forEach(material => material.dispose());
-          } else {
-            mesh.material.dispose();
+        // 再帰的にメッシュを処理
+        mesh.traverse((node) => {
+          if (node.isMesh) {
+            // ジオメトリの解放
+            if (node.geometry) {
+              node.geometry.dispose();
+            }
+            // マテリアルの解放
+            if (node.material) {
+              if (Array.isArray(node.material)) {
+                node.material.forEach(material => {
+                  // テクスチャの解放
+                  if (material.map) material.map.dispose();
+                  if (material.lightMap) material.lightMap.dispose();
+                  if (material.bumpMap) material.bumpMap.dispose();
+                  if (material.normalMap) material.normalMap.dispose();
+                  if (material.specularMap) material.specularMap.dispose();
+                  if (material.envMap) material.envMap.dispose();
+                  material.dispose();
+                });
+              } else {
+                // テクスチャの解放
+                if (node.material.map) node.material.map.dispose();
+                if (node.material.lightMap) node.material.lightMap.dispose();
+                if (node.material.bumpMap) node.material.bumpMap.dispose();
+                if (node.material.normalMap) node.material.normalMap.dispose();
+                if (node.material.specularMap) node.material.specularMap.dispose();
+                if (node.material.envMap) node.material.envMap.dispose();
+                node.material.dispose();
+              }
+            }
           }
-        }
-        if (mesh.geometry) {
-          mesh.geometry.dispose();
-        }
+        });
       }
+
       // エンティティを削除
       entity.parentNode.removeChild(entity);
+      
+      // GLTFローダーのキャッシュをクリア
+      THREE.Cache.clear();
     }
   }
 
@@ -165,6 +199,14 @@
     entity.setAttribute('scale', '1 1 1');
     entity.setAttribute('animation-mixer', '');
     entity.setAttribute('shadow', 'cast: true; receive: false');
+
+    // アニメーションミキサーの参照を取得
+    entity.addEventListener('model-loaded', () => {
+      const mesh = entity.getObject3D('mesh');
+      if (mesh) {
+        currentMixer = entity.components['animation-mixer'].mixer;
+      }
+    });
     
     orbitRoot.appendChild(entity);
     return entity;
@@ -178,11 +220,13 @@
         // 現在のモデルを削除
         removeEntity(currentModel);
         
-        // 新しいモデルを作成
-        createModel(targetId);
-        
-        // 現在のモデルIDを更新
-        currentModel = targetId;
+        // ガベージコレクションを促す
+        setTimeout(() => {
+          // 新しいモデルを作成
+          createModel(targetId);
+          // 現在のモデルIDを更新
+          currentModel = targetId;
+        }, 100);
       }
     });
   });
