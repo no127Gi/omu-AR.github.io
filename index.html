@@ -16,7 +16,6 @@
       position:fixed;left:0;right:0;bottom:1rem;
       display:flex;justify-content:center;gap:.5rem;
       pointer-events:auto;          /* タップを UI に通す */
-      z-index:1000;                /* z-indexを追加 */
     }
     .model-btn{
       padding:.6rem 1rem;
@@ -30,7 +29,7 @@
       position: fixed;
       top: 1rem;
       left: 1rem;
-      z-index: 1002;               /* ロゴも同様に前面に */
+      z-index: 1000;
       pointer-events: auto;
     }
     #logo-link img {
@@ -39,96 +38,82 @@
       border-radius: 5px;
     }
 
-    /* ハンバーガーメニュー */
-    #menu-btn {
+    /* ハンバーガーメニューとサイドパネルのスタイル */
+    .hamburger {
       position: fixed;
       top: 1rem;
       right: 1rem;
-      z-index: 1002;               /* ボタンをパネルより前に */
-      width: 40px;
-      height: 40px;
-      background: rgba(0,0,0,0.55);
-      border-radius: 8px;
+      z-index: 1001;
+      background: rgba(0,0,0,.55);
       border: 1px solid #fff;
-      color: white;
-      font-size: 24px;
+      border-radius: 8px;
+      width: 44px;
+      height: 44px;
       cursor: pointer;
       pointer-events: auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
+      backdrop-filter: blur(4px);
     }
 
-    /* メニューパネル */
-    #menu-panel {
+    .hamburger span {
+      display: block;
+      position: absolute;
+      width: 24px;
+      height: 2px;
+      left: 10px;
+      background: #fff;
+      transition: 0.3s;
+    }
+
+    .hamburger span:nth-child(1) { top: 14px; }
+    .hamburger span:nth-child(2) { top: 21px; }
+    .hamburger span:nth-child(3) { top: 28px; }
+
+    .hamburger.active span:nth-child(1) {
+      transform: rotate(45deg);
+      top: 21px;
+    }
+    .hamburger.active span:nth-child(2) {
+      opacity: 0;
+    }
+    .hamburger.active span:nth-child(3) {
+      transform: rotate(-45deg);
+      top: 21px;
+    }
+
+    .side-panel {
       position: fixed;
       top: 0;
-      right: -100%;  /* 画面外に完全に隠す */
-      width: 80%;    /* スマホ向けに幅を調整 */
-      max-width: 300px;
-      height: 100vh;
-      background: rgba(0,0,0,0.8);
+      right: -300px;
+      width: 300px;
+      height: 100%;
+      background: rgba(0,0,0,.75);
+      backdrop-filter: blur(4px);
       transition: 0.3s;
+      z-index: 1000;
       padding: 60px 20px 20px;
-      color: white;
-      pointer-events: auto;
-      overscroll-behavior: contain; /* スクロールの伝播を防止 */
-      -webkit-overflow-scrolling: touch; /* iOSのスムーズスクロール */
-      z-index: 1001;               /* メニューパネルを最前面に */
+      color: #fff;
     }
 
-    #menu-panel.open {
+    .side-panel.active {
       right: 0;
     }
 
-    /* スライダー関連 */
     .slider-container {
       margin: 20px 0;
     }
 
-    .slider-label {
+    .slider-container label {
       display: block;
-      margin-bottom: 10px;
-      color: white;
+      margin-bottom: 5px;
     }
 
-    .slider {
+    .slider-container input {
       width: 100%;
-      margin: 10px 0;
-      -webkit-appearance: none;
-      appearance: none;
-      height: 25px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 12px;
-      outline: none;
-      padding: 0;
     }
 
-    /* スライダーのつまみ */
-    .slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 25px;
-      height: 25px;
-      background: white;
-      border-radius: 50%;
-      cursor: pointer;
-    }
-
-    .slider::-moz-range-thumb {
-      width: 25px;
-      height: 25px;
-      background: white;
-      border-radius: 50%;
-      cursor: pointer;
-      border: none;
-    }
-
-    /* A-Frameシーンのz-indexを調整 */
-    .a-canvas {
-      z-index: 0 !important;
+    .value-display {
+      color: #fff;
+      margin-top: 5px;
     }
   </style>
 
@@ -154,32 +139,33 @@
   <img src="omutsulogo.png" alt="Omutsu Logo">
 </a>
 
-<!-- ハンバーガーメニュー -->
-<button id="menu-btn">☰</button>
+<!-- ハンバーガーメニューボタン -->
+<button class="hamburger">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
 
-<!-- メニューパネル -->
-<div id="menu-panel">
+<!-- サイドパネル -->
+<div class="side-panel">
   <div class="slider-container">
-    <label class="slider-label">Position X (0.5 - 1.5)</label>
-    <input type="range" class="slider" id="position-slider"
-           min="0.5" max="1.5" step="0.1" value="1.1">
+    <label for="position-slider">Position X (0.5 - 1.5)</label>
+    <input type="range" id="position-slider" min="0.5" max="1.5" step="0.1" value="1.1">
+    <div class="value-display">Current: <span id="position-value">1.1</span></div>
   </div>
   
   <div class="slider-container">
-    <label class="slider-label">Scale (0.8 - 1.2)</label>
-    <input type="range" class="slider" id="scale-slider"
-           min="0.8" max="1.2" step="0.1" value="1.0">
+    <label for="scale-slider">Scale (0.5 - 2.0)</label>
+    <input type="range" id="scale-slider" min="0.5" max="2" step="0.1" value="1">
+    <div class="value-display">Current: <span id="scale-value">1.0</span></div>
   </div>
 </div>
 
 <!-- ────────────────────────────────
      A‑Frame / AR.js シーン
 ───────────────────────────────── -->
-<a-scene embedded arjs="sourceWidth: 1280; sourceHeight: 960; displayWidth: 1280; displayHeight: 960;"
-         shadow="enabled: true; autoUpdate: true; type: pcfsoft; mapSizeWidth: 1024; mapSizeHeight: 1024"
-         renderer="antialias: true; logarithmicDepthBuffer: true;"
-         vr-mode-ui="enabled: false"
-         gesture-detector>
+<a-scene embedded arjs
+         shadow="enabled: true; autoUpdate: true; type: pcfsoft; mapSizeWidth: 1024; mapSizeHeight: 1024">
 
     <a-entity light="type: ambient;
                     color: #ffffff;
@@ -262,149 +248,135 @@
 <script>
   const allIds = ['m1Ent','m2Ent','m3Ent','m4Ent','m5Ent'];
   let currentModel = 'm1Ent';
-  let currentMixer = null;
-  let isChanging = false; // モデル切り替え中フラグ
+  let currentMixer = null; // アニメーションミキサーの参照を保持
 
   // モデルの削除とメモリ解放を行う関数
   function removeEntity(entityId) {
-    return new Promise((resolve) => {
-      const entity = document.getElementById(entityId);
-      if (entity) {
-        // アニメーションミキサーの停止と解放
-        if (currentMixer) {
-          currentMixer.stopAllAction();
-          currentMixer = null;
-        }
+    const entity = document.getElementById(entityId);
+    if (entity) {
+      // アニメーションミキサーの停止と解放
+      if (currentMixer) {
+        currentMixer.stopAllAction();
+        currentMixer = null;
+      }
 
-        // モデルのメッシュとマテリアルを解放
-        const mesh = entity.getObject3D('mesh');
-        if (mesh) {
-          mesh.traverse((node) => {
-            if (node.isMesh) {
-              if (node.geometry) node.geometry.dispose();
-              if (node.material) {
-                if (Array.isArray(node.material)) {
-                  node.material.forEach(material => {
-                    Object.keys(material).forEach(prop => {
-                      if (material[prop] && material[prop].isTexture) {
-                        material[prop].dispose();
-                      }
-                    });
-                    material.dispose();
-                  });
-                } else {
-                  Object.keys(node.material).forEach(prop => {
-                    if (node.material[prop] && node.material[prop].isTexture) {
-                      node.material[prop].dispose();
-                    }
-                  });
-                  node.material.dispose();
-                }
+      // モデルのメッシュとマテリアルを解放
+      const mesh = entity.getObject3D('mesh');
+      if (mesh) {
+        // 再帰的にメッシュを処理
+        mesh.traverse((node) => {
+          if (node.isMesh) {
+            // ジオメトリの解放
+            if (node.geometry) {
+              node.geometry.dispose();
+            }
+            // マテリアルの解放
+            if (node.material) {
+              if (Array.isArray(node.material)) {
+                node.material.forEach(material => {
+                  // テクスチャの解放
+                  if (material.map) material.map.dispose();
+                  if (material.lightMap) material.lightMap.dispose();
+                  if (material.bumpMap) material.bumpMap.dispose();
+                  if (material.normalMap) material.normalMap.dispose();
+                  if (material.specularMap) material.specularMap.dispose();
+                  if (material.envMap) material.envMap.dispose();
+                  material.dispose();
+                });
+              } else {
+                // テクスチャの解放
+                if (node.material.map) node.material.map.dispose();
+                if (node.material.lightMap) node.material.lightMap.dispose();
+                if (node.material.bumpMap) node.material.bumpMap.dispose();
+                if (node.material.normalMap) node.material.normalMap.dispose();
+                if (node.material.specularMap) node.material.specularMap.dispose();
+                if (node.material.envMap) node.material.envMap.dispose();
+                node.material.dispose();
               }
             }
-          });
-        }
-
-        // エンティティを削除
-        entity.parentNode.removeChild(entity);
-        THREE.Cache.clear();
-
-        // 少し待ってから解決
-        setTimeout(resolve, 100);
-      } else {
-        resolve();
+          }
+        });
       }
-    });
-  }
 
-  // モデル作成時に現在のスライダー値を適用する関数
-  function applyCurrentValues(entity) {
-    if (entity) {
-      const posX = positionSlider.value;
-      const scale = scaleSlider.value;
-      entity.setAttribute('position', `${posX} 0 0`);
-      entity.setAttribute('scale', `${scale} ${scale} ${scale}`);
+      // エンティティを削除
+      entity.parentNode.removeChild(entity);
+      
+      // GLTFローダーのキャッシュをクリア
+      THREE.Cache.clear();
     }
   }
 
   // 新しいモデルを作成する関数
   function createModel(modelId) {
-    return new Promise((resolve) => {
-      const orbitRoot = document.getElementById('orbitRoot');
-      const entity = document.createElement('a-entity');
-      
-      entity.setAttribute('id', modelId);
-      entity.setAttribute('gltf-model', `#${modelId.replace('Ent', '')}`);
-      entity.setAttribute('animation-mixer', '');
-      entity.setAttribute('shadow', 'cast: true; receive: false');
-
-      // モデルロード完了時の処理
-      entity.addEventListener('model-loaded', () => {
-        const mesh = entity.getObject3D('mesh');
-        if (mesh) {
-          currentMixer = entity.components['animation-mixer'].mixer;
-          applyCurrentValues(entity);
-          resolve(entity);
-        }
-      });
-      
-      orbitRoot.appendChild(entity);
-      applyCurrentValues(entity);
-    });
-  }
-
-  // モデル切り替え関数
-  async function switchModel(targetId) {
-    if (isChanging || currentModel === targetId) return;
+    const orbitRoot = document.getElementById('orbitRoot');
+    const entity = document.createElement('a-entity');
     
-    isChanging = true;
-    try {
-      await removeEntity(currentModel);
-      const newEntity = await createModel(targetId);
-      currentModel = targetId;
-    } catch (error) {
-      console.error('Error switching model:', error);
-    } finally {
-      isChanging = false;
-    }
+    entity.setAttribute('id', modelId);
+    entity.setAttribute('gltf-model', `#${modelId.replace('Ent', '')}`);
+    entity.setAttribute('position', `${positionSlider.value} 0 0`);
+    entity.setAttribute('scale', `${scaleSlider.value} ${scaleSlider.value} ${scaleSlider.value}`);
+    entity.setAttribute('animation-mixer', '');
+    entity.setAttribute('shadow', 'cast: true; receive: false');
+
+    // アニメーションミキサーの参照を取得
+    entity.addEventListener('model-loaded', () => {
+      const mesh = entity.getObject3D('mesh');
+      if (mesh) {
+        currentMixer = entity.components['animation-mixer'].mixer;
+      }
+    });
+    
+    orbitRoot.appendChild(entity);
+    return entity;
   }
 
-  // ボタンクリックハンドラー
   document.querySelectorAll('.model-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const targetId = btn.dataset.target;
-      switchModel(targetId);
+      
+      if (currentModel !== targetId) {
+        // 現在のモデルを削除
+        removeEntity(currentModel);
+        
+        // ガベージコレクションを促す
+        setTimeout(() => {
+          // 新しいモデルを作成
+          createModel(targetId);
+          // 現在のモデルIDを更新
+          currentModel = targetId;
+        }, 100);
+      }
     });
   });
 
-  // メニュー開閉の制御
-  const menuBtn = document.getElementById('menu-btn');
-  const menuPanel = document.getElementById('menu-panel');
+  // ハンバーガーメニューの制御
+  const hamburger = document.querySelector('.hamburger');
+  const sidePanel = document.querySelector('.side-panel');
   
-  menuBtn.addEventListener('click', () => {
-    menuPanel.classList.toggle('open');
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('active');
+    sidePanel.classList.toggle('active');
   });
-
-  // タッチイベントの伝播を防止
-  menuPanel.addEventListener('touchmove', (e) => {
-    e.stopPropagation();
-  }, { passive: false });
 
   // スライダーの制御
   const positionSlider = document.getElementById('position-slider');
   const scaleSlider = document.getElementById('scale-slider');
+  const positionValue = document.getElementById('position-value');
+  const scaleValue = document.getElementById('scale-value');
 
-  function updateModelPosition(x) {
+  function updateModelPosition(value) {
     const currentEntity = document.getElementById(currentModel);
     if (currentEntity) {
-      currentEntity.setAttribute('position', `${x} 0 0`);
+      currentEntity.setAttribute('position', `${value} 0 0`);
+      positionValue.textContent = value;
     }
   }
 
-  function updateModelScale(scale) {
+  function updateModelScale(value) {
     const currentEntity = document.getElementById(currentModel);
     if (currentEntity) {
-      currentEntity.setAttribute('scale', `${scale} ${scale} ${scale}`);
+      currentEntity.setAttribute('scale', `${value} ${value} ${value}`);
+      scaleValue.textContent = value;
     }
   }
 
@@ -415,34 +387,6 @@
   scaleSlider.addEventListener('input', (e) => {
     updateModelScale(e.target.value);
   });
-
-  // スライダーのタッチイベント対応
-  [positionSlider, scaleSlider].forEach(slider => {
-    slider.addEventListener('touchstart', (e) => {
-      e.stopPropagation();
-    }, { passive: false });
-    
-    slider.addEventListener('touchmove', (e) => {
-      e.stopPropagation();
-    }, { passive: false });
-  });
-
-  // スライダーの値変更をより確実に
-  function updateFromSlider(e) {
-    const currentEntity = document.getElementById(currentModel);
-    if (currentEntity) {
-      requestAnimationFrame(() => {
-        if (e.target === positionSlider) {
-          updateModelPosition(e.target.value);
-        } else if (e.target === scaleSlider) {
-          updateModelScale(e.target.value);
-        }
-      });
-    }
-  }
-
-  positionSlider.addEventListener('input', updateFromSlider);
-  scaleSlider.addEventListener('input', updateFromSlider);
 </script>
 
 </body>
