@@ -24,6 +24,19 @@
       color:#fff;font-size:.9rem;
       backdrop-filter:blur(4px);
     }
+    /* ロゴ用のスタイルを追加 */
+    #logo-link {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      z-index: 1000;
+      pointer-events: auto;
+    }
+    #logo-link img {
+      width: 50px;
+      height: auto;
+      border-radius: 5px;
+    }
   </style>
 
   <script>
@@ -42,6 +55,11 @@
 </head>
 
 <body>
+
+<!-- ロゴとリンク -->
+<a href="https://wel-fashion.jp/" id="logo-link" target="_blank">
+  <img src="omutsulogo.png" alt="Omutsu Logo">
+</a>
 
 <!-- ────────────────────────────────
      A‑Frame / AR.js シーン
