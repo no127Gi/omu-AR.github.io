@@ -320,6 +320,16 @@
     }
   }
 
+  // モデル作成時に現在のスライダー値を適用する関数
+  function applyCurrentValues(entity) {
+    if (entity) {
+      const posX = positionSlider.value;
+      const scale = scaleSlider.value;
+      entity.setAttribute('position', `${posX} 0 0`);
+      entity.setAttribute('scale', `${scale} ${scale} ${scale}`);
+    }
+  }
+
   // 新しいモデルを作成する関数
   function createModel(modelId) {
     const orbitRoot = document.getElementById('orbitRoot');
@@ -327,20 +337,22 @@
     
     entity.setAttribute('id', modelId);
     entity.setAttribute('gltf-model', `#${modelId.replace('Ent', '')}`);
-    entity.setAttribute('position', '1.1 0 0');
-    entity.setAttribute('scale', '1 1 1');
     entity.setAttribute('animation-mixer', '');
     entity.setAttribute('shadow', 'cast: true; receive: false');
 
-    // アニメーションミキサーの参照を取得
+    // モデルロード完了時の処理
     entity.addEventListener('model-loaded', () => {
       const mesh = entity.getObject3D('mesh');
       if (mesh) {
         currentMixer = entity.components['animation-mixer'].mixer;
+        // モデルロード完了後に値を適用
+        applyCurrentValues(entity);
       }
     });
     
     orbitRoot.appendChild(entity);
+    // 初期値を設定
+    applyCurrentValues(entity);
     return entity;
   }
 
@@ -352,13 +364,11 @@
         // 現在のモデルを削除
         removeEntity(currentModel);
         
-        // ガベージコレクションを促す
+        // 新しいモデルを作成（遅延を短く）
         setTimeout(() => {
-          // 新しいモデルを作成
           createModel(targetId);
-          // 現在のモデルIDを更新
           currentModel = targetId;
-        }, 100);
+        }, 50);
       }
     });
   });
@@ -413,28 +423,22 @@
     }, { passive: false });
   });
 
-  // スライダーの値変更をより滑らかに
+  // スライダーの値変更をより確実に
   function updateFromSlider(e) {
-    requestAnimationFrame(() => {
-      if (e.target === positionSlider) {
-        updateModelPosition(e.target.value);
-      } else if (e.target === scaleSlider) {
-        updateModelScale(e.target.value);
-      }
-    });
+    const currentEntity = document.getElementById(currentModel);
+    if (currentEntity) {
+      requestAnimationFrame(() => {
+        if (e.target === positionSlider) {
+          updateModelPosition(e.target.value);
+        } else if (e.target === scaleSlider) {
+          updateModelScale(e.target.value);
+        }
+      });
+    }
   }
 
   positionSlider.addEventListener('input', updateFromSlider);
   scaleSlider.addEventListener('input', updateFromSlider);
-
-  // モデル作成時にスライダーの値を適用
-  const originalCreateModel = createModel;
-  createModel = function(modelId) {
-    const entity = originalCreateModel(modelId);
-    updateModelPosition(positionSlider.value);
-    updateModelScale(scaleSlider.value);
-    return entity;
-  };
 </script>
 
 </body>
