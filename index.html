@@ -53,20 +53,28 @@
       font-size: 24px;
       cursor: pointer;
       pointer-events: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
     }
 
     /* メニューパネル */
     #menu-panel {
       position: fixed;
       top: 0;
-      right: -300px;
-      width: 300px;
+      right: -100%;  /* 画面外に完全に隠す */
+      width: 80%;    /* スマホ向けに幅を調整 */
+      max-width: 300px;
       height: 100vh;
       background: rgba(0,0,0,0.8);
       transition: 0.3s;
       padding: 60px 20px 20px;
       color: white;
       pointer-events: auto;
+      overscroll-behavior: contain; /* スクロールの伝播を防止 */
+      -webkit-overflow-scrolling: touch; /* iOSのスムーズスクロール */
     }
 
     #menu-panel.open {
@@ -87,6 +95,33 @@
     .slider {
       width: 100%;
       margin: 10px 0;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 25px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      outline: none;
+      padding: 0;
+    }
+
+    /* スライダーのつまみ */
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 25px;
+      height: 25px;
+      background: white;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .slider::-moz-range-thumb {
+      width: 25px;
+      height: 25px;
+      background: white;
+      border-radius: 50%;
+      cursor: pointer;
+      border: none;
     }
   </style>
 
@@ -326,6 +361,11 @@
     menuPanel.classList.toggle('open');
   });
 
+  // タッチイベントの伝播を防止
+  menuPanel.addEventListener('touchmove', (e) => {
+    e.stopPropagation();
+  }, { passive: false });
+
   // スライダーの制御
   const positionSlider = document.getElementById('position-slider');
   const scaleSlider = document.getElementById('scale-slider');
@@ -351,6 +391,31 @@
   scaleSlider.addEventListener('input', (e) => {
     updateModelScale(e.target.value);
   });
+
+  // スライダーのタッチイベント対応
+  [positionSlider, scaleSlider].forEach(slider => {
+    slider.addEventListener('touchstart', (e) => {
+      e.stopPropagation();
+    }, { passive: false });
+    
+    slider.addEventListener('touchmove', (e) => {
+      e.stopPropagation();
+    }, { passive: false });
+  });
+
+  // スライダーの値変更をより滑らかに
+  function updateFromSlider(e) {
+    requestAnimationFrame(() => {
+      if (e.target === positionSlider) {
+        updateModelPosition(e.target.value);
+      } else if (e.target === scaleSlider) {
+        updateModelScale(e.target.value);
+      }
+    });
+  }
+
+  positionSlider.addEventListener('input', updateFromSlider);
+  scaleSlider.addEventListener('input', updateFromSlider);
 
   // モデル作成時にスライダーの値を適用
   const originalCreateModel = createModel;
