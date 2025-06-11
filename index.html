@@ -16,6 +16,7 @@
       position:fixed;left:0;right:0;bottom:1rem;
       display:flex;justify-content:center;gap:.5rem;
       pointer-events:auto;          /* タップを UI に通す */
+      z-index:1000;                /* z-indexを追加 */
     }
     .model-btn{
       padding:.6rem 1rem;
@@ -29,7 +30,7 @@
       position: fixed;
       top: 1rem;
       left: 1rem;
-      z-index: 1000;
+      z-index: 1002;               /* ロゴも同様に前面に */
       pointer-events: auto;
     }
     #logo-link img {
@@ -43,7 +44,7 @@
       position: fixed;
       top: 1rem;
       right: 1rem;
-      z-index: 1000;
+      z-index: 1002;               /* ボタンをパネルより前に */
       width: 40px;
       height: 40px;
       background: rgba(0,0,0,0.55);
@@ -75,6 +76,7 @@
       pointer-events: auto;
       overscroll-behavior: contain; /* スクロールの伝播を防止 */
       -webkit-overflow-scrolling: touch; /* iOSのスムーズスクロール */
+      z-index: 1001;               /* メニューパネルを最前面に */
     }
 
     #menu-panel.open {
@@ -123,6 +125,11 @@
       cursor: pointer;
       border: none;
     }
+
+    /* A-Frameシーンのz-indexを調整 */
+    .a-canvas {
+      z-index: 0 !important;
+    }
   </style>
 
   <script>
@@ -168,8 +175,11 @@
 <!-- ────────────────────────────────
      A‑Frame / AR.js シーン
 ───────────────────────────────── -->
-<a-scene embedded arjs
-         shadow="enabled: true; autoUpdate: true; type: pcfsoft; mapSizeWidth: 1024; mapSizeHeight: 1024">
+<a-scene embedded arjs="sourceWidth: 1280; sourceHeight: 960; displayWidth: 1280; displayHeight: 960;"
+         shadow="enabled: true; autoUpdate: true; type: pcfsoft; mapSizeWidth: 1024; mapSizeHeight: 1024"
+         renderer="antialias: true; logarithmicDepthBuffer: true;"
+         vr-mode-ui="enabled: false"
+         gesture-detector>
 
     <a-entity light="type: ambient;
                     color: #ffffff;
